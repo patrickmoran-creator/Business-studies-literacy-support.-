@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Business Studies Literacy Hub – Sentence Games</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f8fafc;
+      line-height: 1.5;
+      color: #0f172a;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: 1.8rem;
+    }
+
+    .subtitle {
+      margin: 0 0 14px;
+      font-size: 0.95rem;
+      color: #475569;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .nav-button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .nav-button.active {
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
+    .nav-button:hover {
+      filter: brightness(1.05);
+    }
+
+    .layout-main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 960px) {
+      .layout-main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+      margin-bottom: 14px;
+    }
+
+    .small {
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    /* SENTENCE SORT STYLES */
+
+    .sentence-pool {
+      min-height: 260px;
+      border: 1px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 10px;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sentence-card {
+      background: #e2e8f0;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 0.92rem;
+      cursor: grab;
+      border: 1px solid #cbd5e1;
+    }
+
+    .sentence-card.dragging {
+      opacity: 0.6;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .drop-column {
+      background: #f9fafb;
+      border-radius: 10px;
+      padding: 8px;
+      border: 2px dashed #cbd5e1;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .drop-column.highlight {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .col-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+
+    .buttons {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: #1d4ed8;
+      color: #ffffff;
+    }
+
+    button.secondary {
+      background: #64748b;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+    }
+
+    .feedback {
+      margin-top: 8px;
+      font-size: 0.9rem;
+    }
+
+    .correct {
+      color: #15803d;
+      font-weight: 600;
+    }
+
+    .incorrect {
+      color: #b91c1c;
+      font-weight: 600;
+    }
+
+    /* CONNECTIVES GAME STYLES */
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+
+    th, td {
+      padding: 8px;
+      vertical-align: top;
+      font-size: 0.92rem;
+    }
+
+    th {
+      text-align: left;
+      border-bottom: 1px solid #cbd5e1;
+      background: #f1f5f9;
+    }
+
+    tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    select:focus {
+      outline: 2px solid #2563eb;
+      outline-offset: 1px;
+    }
+
+    .completed {
+      font-size: 0.9rem;
+    }
+
+    /* TEACHER NOTES */
+
+    .notes-list {
+      padding-left: 18px;
+    }
+
+    .notes-list li {
+      margin-bottom: 4px;
+    }
+
+    /* VIEW TOGGLING */
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Business Studies Literacy Hub</h1>
+  <p class="subtitle">
+    Interactive games to build sentence control, cause–effect explanations and Business Studies vocabulary.
+  </p>
+
+  <div class="nav-buttons">
+    <button class="nav-button active" data-view="sentence-sort-view">Game 1 – Sentence Sort</button>
+    <button class="nav-button" data-view="connectives-view">Game 2 – Cause–Effect Connectives</button>
+  </div>
+
+  <div class="layout-main">
+    <!-- LEFT: GAMES -->
+    <div>
+      <!-- SENTENCE SORT VIEW -->
+      <div id="sentence-sort-view" class="view active">
+        <div class="card">
+          <h2 style="margin:0 0 8px;font-size:1.15rem;">Sentence Sort – Simple / Compound / Complex</h2>
+          <p class="small">
+            Drag each Business Studies sentence into the correct column. When you drop a sentence, 
+            it will turn <strong>green</strong> if it’s correct or <strong>red</strong> if it’s incorrect. 
+            You can drag it back to the pool to reset.
+          </p>
+          <div style="display:grid;grid-template-columns:1.2fr 1.8fr;gap:16px;">
+            <div>
+              <h3 style="margin:0 0 4px;font-size:1rem;">Sentence pool</h3>
+              <p class="small">
+                These sentences come from operations, marketing, finance and globalisation topics.
+              </p>
+              <div id="pool" class="sentence-pool"></div>
+            </div>
+            <div>
+              <div class="columns">
+                <div>
+                  <div class="col-title">Simple</div>
+                  <div class="drop-column" id="simple-col" data-type="simple"></div>
+                </div>
+                <div>
+                  <div class="col-title">Compound</div>
+                  <div class="drop-column" id="compound-col" data-type="compound"></div>
+                </div>
+                <div>
+                  <div class="col-title">Complex</div>
+                  <div class="drop-column" id="complex-col" data-type="complex"></div>
+                </div>
+              </div>
+              <div class="buttons">
+                <button id="checkSortBtn" type="button">Check my answers</button>
+                <button id="resetSortBtn" type="button" class="secondary">Reset game</button>
+              </div>
+              <div id="sortFeedback" class="feedback"></div>
+              <p class="small" style="margin-top:6px;">
+                Tip: <strong>Simple</strong> = one main clause; <strong>Compound</strong> = two main
+                clauses joined by <em>and / but / so</em>; <strong>Complex</strong> = a main clause +
+                at least one subordinate clause (<em>because, when, although, if, which, while</em>…).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONNECTIVES VIEW -->
+      <div id="connectives-view" class="view">
+        <div class="card">
+          <h2 style="margin:0 0 8px;font-size:1.15rem;">Cause–Effect Connectives – Business Sentences</h2>
+          <p class="small">
+            Choose the connective and clause that best show the cause–effect relationship in each Business Studies sentence.
+            Then check your answers to see which ones build clear explanations.
+          </p>
+          <div class="small" style="margin-bottom:6px;">
+            Connectives in this game: <strong>because, so, as a result, therefore, which means that, consequently, hence</strong>.
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:5%;">#</th>
+                <th style="width:27%;">Sentence (start)</th>
+                <th style="width:18%;">Choose connective</th>
+                <th style="width:25%;">Choose clause</th>
+                <th style="width:25%;">Completed sentence</th>
+              </tr>
+            </thead>
+            <tbody id="connectiveRows"></tbody>
+          </table>
+          <div class="buttons">
+            <button id="checkConnBtn" type="button">Check answers</button>
+            <button id="resetConnBtn" type="button" class="secondary">Reset game</button>
+          </div>
+          <div id="connFeedback" class="feedback"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: TEACHER NOTES -->
+    <aside>
+      <div class="card">
+        <h2 style="margin:0 0 8px;font-size:1.1rem;">Teacher notes</h2>
+        <p class="small">
+          These games are designed to align with <strong>What Works Best</strong> and
+          <strong>Universal Design for Learning (UDL)</strong> principles.
+        </p>
+        <h3 style="margin:8px 0 4px;font-size:1rem;">Learning intentions</h3>
+        <ul class="notes-list small">
+          <li>Students recognise and sort simple, compound and complex sentences in Business contexts.</li>
+          <li>Students select appropriate cause–effect connectives and clauses to explain operations and marketing decisions.</li>
+          <li>Students build confidence controlling sentence structure in exam-style writing.</li>
+        </ul>
+        <h3 style="margin:8px 0 4px;font-size:1rem;">UDL connections</h3>
+        <ul class="notes-list small">
+          <li><strong>Multiple means of engagement:</strong> interactive dragging, immediate colour feedback, low-stakes practice.</li>
+          <li><strong>Multiple means of representation:</strong> visual sentence sorting, explicit connective and clause choices, teacher-led modelling.</li>
+          <li><strong>Multiple means of action &amp; expression:</strong> students can discuss choices orally, type improved sentences, or use the patterns in written exam responses.</li>
+        </ul>
+        <h3 style="margin:8px 0 4px;font-size:1rem;">Suggestions for use</h3>
+        <ul class="notes-list small">
+          <li>Use Sentence Sort as a warm-up before extended response practice.</li>
+          <li>After the Connectives game, ask students to write one new paragraph using at least three different connectives and clauses.</li>
+          <li>Project the games and “think aloud” as you make decisions about sentence type and cause–effect links.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    /* ========== VIEW SWITCHING ========== */
+    const navButtons = document.querySelectorAll(".nav-button");
+    const views = document.querySelectorAll(".view");
+
+    navButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const targetId = btn.dataset.view;
+        navButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        views.forEach(v => {
+          if (v.id === targetId) {
+            v.classList.add("active");
+          } else {
+            v.classList.remove("active");
+          }
+        });
+      });
+    });
+
+    /* ========== HELPER: SHUFFLE ARRAY ========== */
+    function shuffleArray(array) {
+      const arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    /* ========== GAME 1: SENTENCE SORT ========== */
+
+    const sortSentences = [
+      // SIMPLE
+      {
+        text: "Globalisation has significantly reshaped operations management for large fast-food chains.",
+        type: "simple"
+      },
+      {
+        text: "Customers expect fast service.",
+        type: "simple"
+      },
+      {
+        text: "Effective managers monitor sales data and adjust their strategies regularly.",
+        type: "simple"
+      },
+      {
+        text: "Transport costs have increased.",
+        type: "simple"
+      },
+      {
+        text: "Quality is a key performance objective.",
+        type: "simple"
+      },
+      // COMPOUND
+      {
+        text: "Demand for the product falls in a recession, but fixed costs must still be paid.",
+        type: "compound"
+      },
+      {
+        text: "Online reviews are important for the business, and they can strongly influence customer loyalty.",
+        type: "compound"
+      },
+      {
+        text: "The company invested in new technology, so productivity increased.",
+        type: "compound"
+      },
+      {
+        text: "The business launched a new loyalty program, and customers responded positively.",
+        type: "compound"
+      },
+      {
+        text: "The marketing budget was reduced, yet sales remained stable.",
+        type: "compound"
+      },
+      // COMPLEX
+      {
+        text: "By sourcing ingredients from overseas suppliers, these businesses can access lower input costs and a wider range of products.",
+        type: "complex"
+      },
+      {
+        text: "When interest rates rise, customers are less willing to borrow money for big purchases.",
+        type: "complex"
+      },
+      {
+        text: "The business offers discounts during off-peak periods because it wants to maximise capacity utilisation.",
+        type: "complex"
+      },
+      {
+        text: "If suppliers increase their prices, profit margins will shrink unless the business raises its own prices.",
+        type: "complex"
+      },
+      {
+        text: "Although the business operates in a competitive market, it maintains strong customer loyalty through personalised service.",
+        type: "complex"
+      },
+      {
+        text: "As global sourcing reduces input costs, the business can pursue a cost leadership strategy.",
+        type: "complex"
+      },
+      {
+        text: "Because government regulations increased compliance costs, the business redesigned its operations processes.",
+        type: "complex"
+      },
+      {
+        text: "When the business adopted just-in-time inventory, storage costs fell and cash flow improved.",
+        type: "complex"
+      }
+    ];
+
+    const pool = document.getElementById("pool");
+    const sortCols = document.querySelectorAll(".drop-column");
+    const sortFeedback = document.getElementById("sortFeedback");
+
+    function setNeutral(card) {
+      card.style.backgroundColor = "#e2e8f0";
+    }
+
+    function setCorrect(card) {
+      card.style.backgroundColor = "#bbf7d0"; // light green
+    }
+
+    function setIncorrect(card) {
+      card.style.backgroundColor = "#fecaca"; // light red
+    }
+
+    function createSentenceCard(sentence, index) {
+      const div = document.createElement("div");
+      div.classList.add("sentence-card");
+      div.draggable = true;
+      div.textContent = sentence.text;
+      div.dataset.type = sentence.type;
+      div.dataset.index = index.toString();
+      setNeutral(div);
+      return div;
+    }
+
+    function populatePool() {
+      pool.innerHTML = "";
+      const shuffled = shuffleArray(sortSentences);
+      shuffled.forEach((s, i) => {
+        pool.appendChild(createSentenceCard(s, i));
+      });
+    }
+
+    let draggedCard = null;
+
+    document.addEventListener("dragstart", (e) => {
+      const target = e.target;
+      if (target.classList && target.classList.contains("sentence-card")) {
+        draggedCard = target;
+        target.classList.add("dragging");
+      }
+    });
+
+    document.addEventListener("dragend", (e) => {
+      const target = e.target;
+      if (target.classList && target.classList.contains("sentence-card")) {
+        target.classList.remove("dragging");
+      }
+      draggedCard = null;
+    });
+
+    sortCols.forEach((col) => {
+      col.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        col.classList.add("highlight");
+      });
+
+      col.addEventListener("dragleave", () => {
+        col.classList.remove("highlight");
+      });
+
+      col.addEventListener("drop", (e) => {
+        e.preventDefault();
+        col.classList.remove("highlight");
+        if (draggedCard) {
+          col.appendChild(draggedCard);
+          const expected = col.dataset.type;
+          if (draggedCard.dataset.type === expected) {
+            setCorrect(draggedCard);
+          } else {
+            setIncorrect(draggedCard);
+          }
+        }
+      });
+    });
+
+    // Drop back to pool -> reset colour
+    pool.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
+    pool.addEventListener("drop", (e) => {
+      e.preventDefault();
+      if (draggedCard) {
+        pool.appendChild(draggedCard);
+        setNeutral(draggedCard);
+      }
+    });
+
+    document.getElementById("checkSortBtn").addEventListener("click", () => {
+      // reset colours first
+      document.querySelectorAll(".sentence-card").forEach(setNeutral);
+
+      let total = 0;
+      let correct = 0;
+
+      sortCols.forEach((col) => {
+        const expected = col.dataset.type;
+        const cards = col.querySelectorAll(".sentence-card");
+        cards.forEach((card) => {
+          total++;
+          if (card.dataset.type === expected) {
+            setCorrect(card);
+            correct++;
+          } else {
+            setIncorrect(card);
+          }
+        });
+      });
+
+      if (total === 0) {
+        sortFeedback.textContent = "Drag at least one sentence into a column, then check again.";
+        sortFeedback.className = "feedback";
+        return;
+      }
+
+      sortFeedback.className = "feedback";
+      if (correct === total) {
+        sortFeedback.innerHTML = `<span class="correct">Perfect! All ${total} sentences are in the right place.</span>`;
+      } else {
+        sortFeedback.innerHTML = `<span class="incorrect">${correct} out of ${total} sentences are in the correct column. Try moving the red ones.</span>`;
+      }
+    });
+
+    document.getElementById("resetSortBtn").addEventListener("click", () => {
+      // Clear pool and all columns
+      pool.innerHTML = "";
+      sortCols.forEach((col) => {
+        col.innerHTML = "";
+      });
+      // Rebuild (with a new random order)
+      populatePool();
+      sortFeedback.textContent = "";
+      sortFeedback.className = "feedback";
+    });
+
+    // initial load for sort game
+    populatePool();
+
+    /* ========== GAME 2: CONNECTIVES (with clause dropdown) ========== */
+
+    const connectiveItems = [
+      {
+        id: 1,
+        before: "The business lowered its prices",
+        after: "demand for the product increased among price-sensitive customers",
+        correct: "because",
+        clauseOptions: [
+          "customers were highly price sensitive during the recession",
+          "the HR manager wanted to reduce staff turnover",
+          "the business planned to open new stores overseas"
+        ],
+        correctClause: "customers were highly price sensitive during the recession"
+      },
+      {
+        id: 2,
+        before: "Global sourcing reduced input costs for raw materials",
+        after: "the business was able to offer lower prices and still maintain profit margins",
+        correct: "so",
+        clauseOptions: [
+          "the business was able to offer lower prices and still maintain profit margins",
+          "customers became more demanding about product quality",
+          "the marketing team redesigned the company logo"
+        ],
+        correctClause: "the business was able to offer lower prices and still maintain profit margins"
+      },
+      {
+        id: 3,
+        before: "The company invested in new robotics and computer-aided manufacturing",
+        after: "productivity improved and unit costs fell",
+        correct: "as a result",
+        clauseOptions: [
+          "productivity improved and unit costs fell",
+          "customer complaints about service increased",
+          "the business decided to outsource its marketing function"
+        ],
+        correctClause: "productivity improved and unit costs fell"
+      },
+      {
+        id: 4,
+        before: "Customers were dissatisfied with the existing level of service",
+        after: "the business redesigned its customer service training program",
+        correct: "therefore",
+        clauseOptions: [
+          "the business redesigned its customer service training program",
+          "interest rates in the economy began to rise",
+          "the business increased the number of product lines it offered"
+        ],
+        correctClause: "the business redesigned its customer service training program"
+      },
+      {
+        id: 5,
+        before: "The business relies on a single overseas supplier",
+        after: "any disruption to the supply chain can stop production",
+        correct: "which means that",
+        clauseOptions: [
+          "any disruption to the supply chain can stop production",
+          "the HR department hired more staff",
+          "demand for the product became more seasonal"
+        ],
+        correctClause: "any disruption to the supply chain can stop production"
+      },
+      {
+        id: 6,
+        before: "Government regulations increased compliance costs",
+        after: "the business reviewed its operations to remove inefficiencies",
+        correct: "consequently",
+        clauseOptions: [
+          "the business reviewed its operations to remove inefficiencies",
+          "customers were more willing to purchase premium products",
+          "the company launched a new advertising campaign"
+        ],
+        correctClause: "the business reviewed its operations to remove inefficiencies"
+      },
+      {
+        id: 7,
+        before: "The retailer used data from its loyalty program to personalise promotions",
+        after: "customer engagement with email and app notifications improved",
+        correct: "hence",
+        clauseOptions: [
+          "customer engagement with email and app notifications improved",
+          "suppliers negotiated longer payment terms",
+          "the government changed workplace health and safety laws"
+        ],
+        correctClause: "customer engagement with email and app notifications improved"
+      },
+      {
+        id: 8,
+        before: "The business introduced just-in-time inventory systems",
+        after: "storage costs fell and cash flow improved",
+        correct: "as a result",
+        clauseOptions: [
+          "storage costs fell and cash flow improved",
+          "customer preferences shifted towards online shopping",
+          "the business opened a new head office in another city"
+        ],
+        correctClause: "storage costs fell and cash flow improved"
+      }
+    ];
+
+    const connectiveOptions = [
+      "",
+      "because",
+      "so",
+      "as a result",
+      "therefore",
+      "which means that",
+      "consequently",
+      "hence"
+    ];
+
+    const connectiveTbody = document.getElementById("connectiveRows");
+    const connFeedback = document.getElementById("connFeedback");
+
+    function buildConnectiveTable() {
+      connectiveTbody.innerHTML = "";
+      connectiveItems.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.dataset.id = item.id;
+
+        const tdNum = document.createElement("td");
+        tdNum.textContent = item.id;
+
+        const tdBefore = document.createElement("td");
+        tdBefore.textContent = item.before;
+
+        // connective select
+        const tdSelectConn = document.createElement("td");
+        const selConn = document.createElement("select");
+        selConn.className = "conn-select";
+        connectiveOptions.forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt === "" ? "(choose…)" : opt;
+          selConn.appendChild(o);
+        });
+        tdSelectConn.appendChild(selConn);
+
+        // clause select
+        const tdSelectClause = document.createElement("td");
+        const selClause = document.createElement("select");
+        selClause.className = "clause-select";
+        const defaultOpt = document.createElement("option");
+        defaultOpt.value = "";
+        defaultOpt.textContent = "(choose clause…)";
+        selClause.appendChild(defaultOpt);
+        item.clauseOptions.forEach(opt => {
+          const o = document.createElement("option");
+          o.value = opt;
+          o.textContent = opt;
+          selClause.appendChild(o);
+        });
+        tdSelectClause.appendChild(selClause);
+
+        const tdCompleted = document.createElement("td");
+        tdCompleted.className = "completed";
+
+        tr.appendChild(tdNum);
+        tr.appendChild(tdBefore);
+        tr.appendChild(tdSelectConn);
+        tr.appendChild(tdSelectClause);
+        tr.appendChild(tdCompleted);
+
+        connectiveTbody.appendChild(tr);
+      });
+    }
+
+    function checkConnectives() {
+      let total = 0;
+      let correctCount = 0;
+
+      const rows = connectiveTbody.querySelectorAll("tr");
+      rows.forEach(row => {
+        row.style.backgroundColor = ""; // reset
+        const id = parseInt(row.dataset.id, 10);
+        const item = connectiveItems.find(i => i.id === id);
+        const selConn = row.querySelector("select.conn-select");
+        const selClause = row.querySelector("select.clause-select");
+        const chosenConn = selConn.value;
+        const chosenClause = selClause.value;
+        const completedCell = row.querySelector(".completed");
+
+        if (chosenConn && chosenClause) {
+          total++;
+
+          // build sentence
+          let sentence = "";
+          if (
+            chosenConn === "as a result" ||
+            chosenConn === "therefore" ||
+            chosenConn === "consequently" ||
+            chosenConn === "hence"
+          ) {
+            sentence = item.before + ", " + chosenConn + ", " + chosenClause;
+          } else {
+            sentence = item.before + " " + chosenConn + " " + chosenClause;
+          }
+          if (!/[.!?]$/.test(sentence)) sentence += ".";
+          completedCell.textContent = sentence;
+
+          if (chosenConn === item.correct && chosenClause === item.correctClause) {
+            row.style.backgroundColor = "#bbf7d0"; // green
+            correctCount++;
+          } else {
+            row.style.backgroundColor = "#fecaca"; // red
+          }
+        } else {
+          completedCell.textContent = "";
+        }
+      });
+
+      if (total === 0) {
+        connFeedback.textContent = "Choose a connective and a clause in at least one row, then check again.";
+        connFeedback.className = "feedback";
+        return;
+      }
+
+      if (correctCount === total) {
+        connFeedback.innerHTML = `<span class="correct">Excellent – all your chosen connectives and clauses clearly show cause and effect.</span>`;
+      } else {
+        connFeedback.innerHTML = `<span class="incorrect">${correctCount} out of ${total} answers are fully correct. Check the red rows and think about which clause best matches the cause–effect relationship.</span>`;
+      }
+    }
+
+    function resetConnectives() {
+      buildConnectiveTable();
+      connFeedback.textContent = "";
+      connFeedback.className = "feedback";
+    }
+
+    document.getElementById("checkConnBtn").addEventListener("click", checkConnectives);
+    document.getElementById("resetConnBtn").addEventListener("click", resetConnectives);
+
+    // initial load connectives
+    buildConnectiveTable();
+  </script>
+</body>
+</html>
